@@ -4,14 +4,13 @@ const RM_HEADERS = { "X-Api-Key": RANDOMMER_API_KEY };
 // Randomuser
 async function getRandomUser() {
   const res = await fetch("https://randomuser.me/api/");
-  const data = await res.json();
-  const u = data?.results?.[0];
+  const u = (await res.json()).results[0];
   return {
-    name: `${u?.name?.first} ${u?.name?.last}`.trim(),
-    email: u?.email,
-    gender: u?.gender,
-    location: `${u?.location?.city}, ${u?.location?.country}`,
-    picture: u?.picture?.large,
+    name: `${u.name.first} ${u.name.last}`,
+    email: u.email,
+    gender: u.gender,
+    location: `${u.location.city}, ${u.location.country}`,
+    picture: u.picture.large,
   };
 }
 
@@ -31,14 +30,12 @@ async function getIban() {
 
 // Randommer: credit card
 async function getCreditCard() {
-  const res = await fetch("https://randommer.io/api/Card", { headers: RM_HEADERS });
-  const data = await res.json();
-  const c = Array.isArray(data) ? data[0] : data;
+  const c = await (await fetch("https://randommer.io/api/Card", { headers: RM_HEADERS })).json();
   return {
-    card_number: c?.number || c?.creditCardNumber,
-    card_type: c?.type || c?.creditCardType,
-    expiration_date: c?.expiration || c?.expirationDate,
-    cvv: c?.cvv || c?.cvv2,
+    card_number: c.cardNumber,
+    card_type: c.type,
+    expiration_date: c.date.split("T")[0],
+    cvv: c.cvv
   };
 }
 
@@ -51,17 +48,13 @@ async function getRandomName() {
 
 // Extra APIs: quote and joke
 async function getQuote() {
-  const res = await fetch("https://zenquotes.io/api/random");
-  const arr = await res.json();
-  const q = Array.isArray(arr) ? arr[0] : arr;
-  return { content: q?.q, author: q?.a };
+  const q = (await (await fetch("https://zenquotes.io/api/random")).json())[0];
+  return { content: q.q, author: q.a };
 }
 
 async function getJoke() {
-  const res = await fetch("https://official-joke-api.appspot.com/jokes/programming/random");
-  const arr = await res.json();
-  const j = Array.isArray(arr) ? arr[0] : arr;
-  return { type: "Programming", content: [j?.setup, j?.punchline].filter(Boolean).join(" ") };
+  const j = (await (await fetch("https://official-joke-api.appspot.com/jokes/programming/random")).json())[0];
+  return { type: "Programming", content: [j.setup, j.punchline].join(" ") };
 }
 
 async function main() {
